@@ -44,9 +44,12 @@ def free_bacon(score):
     """
     assert score < 100, 'The game should be over.'
     # BEGIN PROBLEM 2
-    "*** YOUR CODE HERE ***"
-    # END PROBLEM 2
-
+    if score < 10:
+        return score + 2
+    else:
+        difference = (score // 10) - (score % 10)
+        absolute = difference if difference >= 0 else difference * -1
+        return absolute + 2
 
 def take_turn(num_rolls, opponent_score, dice=six_sided):
     """Simulate a turn rolling NUM_ROLLS dice, which may be 0 (Free Bacon).
