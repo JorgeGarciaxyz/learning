@@ -9,6 +9,15 @@ class Movie
   def initialize(title, price_code)
     @title, @price_code = title, price_code
   end
+
+  def rental_point
+    case price_code
+    when REGULAR
+      1
+    when NEW_RELEASE
+      1
+    end
+  end
 end
 
 class Rental
@@ -20,11 +29,12 @@ class Rental
 
   def rental_point
     result = 0
+
     if movie.price_code == Movie::NEW_RELEASE
-      result += 2
+      result += movie.rental_point
       result += (days_rented + 2) if days_rented > 2
     else
-      result += 1
+      result += movie.rental_point
       result += (days_rented + 1) if days_rented > 2
     end
   end
