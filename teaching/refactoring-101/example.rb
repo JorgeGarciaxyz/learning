@@ -15,7 +15,7 @@ class Movie
     when REGULAR
       1
     when NEW_RELEASE
-      1
+      2
     end
   end
 end
@@ -30,11 +30,11 @@ class Rental
   def rental_point
     result = 0
 
+    result += movie.rental_point
+
     if movie.price_code == Movie::NEW_RELEASE
-      result += movie.rental_point
       result += (days_rented + 2) if days_rented > 2
     else
-      result += movie.rental_point
       result += (days_rented + 1) if days_rented > 2
     end
   end
