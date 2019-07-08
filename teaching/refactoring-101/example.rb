@@ -31,11 +31,14 @@ class Rental
     result = 0
 
     result += movie.rental_point
+    result += days_rented_points
+  end
 
-    if movie.price_code == Movie::NEW_RELEASE
-      result += (days_rented + 2) if days_rented > 2
+  def days_rented_points
+    if days > 2
+      movie.price_code == Movie::NEW_RELEASE ? days_rented + 2 : days_rented +1
     else
-      result += (days_rented + 1) if days_rented > 2
+      0
     end
   end
 end
