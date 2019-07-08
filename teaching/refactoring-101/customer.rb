@@ -14,7 +14,7 @@ class Customer
     frequent_renter_points = 0
 
     @rentals.each do |rental|
-      frequent_renter_points = rental.rental_point
+      frequent_renter_points = rental.rental_points
     end
 
     puts "Your total frequent renter points is #{frequent_renter_points}"

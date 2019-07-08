@@ -27,7 +27,7 @@ class Rental
     @movie, @days_rented = movie, days_rented
   end
 
-  def rental_point
+  def rental_points
     result = 0
 
     result += movie.rental_point
