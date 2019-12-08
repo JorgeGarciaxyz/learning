@@ -3,7 +3,6 @@ var app = new Vue({
   data: {
     altText: "A pair of socks",
     cart: 0,
-    description: 'Some nice socks!',
     details: ["80% cotton", "20% skill", "Power of will"],
     image: "./assets/vmSocks-green.jpg",
     inStock: true,
