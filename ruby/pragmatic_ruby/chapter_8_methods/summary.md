@@ -72,3 +72,39 @@ end
 tc = TaxCalculator.new("Sales tax") { |amt| amt * 0.075 }
 tc.get_tax(100) # => "Sales tax on 100 = 7.5"
 ```
+
+### Return statements
+
+If you give the return multiple parameters. the method returns them in an array.
+You can use parallel assignment to collect this return value:
+
+```ruby
+num, square = meth_three
+```
+
+### Splat in method calls
+
+We’ve seen that if you prefix the name of a parameter with an asterisk, multiple arguments
+in the call to the method will be passed as an array. Well, the same thing works in reverse.
+
+```ruby
+def five(a, b, c, d, e)
+  "I was passed #{a} #{b} #{c} #{d} #{e}"
+end
+
+five(1, 2, 3, 4, 5)
+five(1, 2, 3, *["a", "b"]) # => I was passed 1, 2, 3, a, b
+```
+
+### Keyword arguments
+
+You can collect any extra hash arguments as a hash parameter, just prefixing the argument list with two asterisks
+
+```ruby
+def search(field, genre: nil, duration: 120, **rest)
+  p [field, genre, duration, rest ]
+end
+
+search(:title, duration: 432, stars: 3, genre: "jazz", tempo: "slow")
+# => [:title, "jazz", 432, {:stars=>3, :tempo=>"slow"}]
+```
