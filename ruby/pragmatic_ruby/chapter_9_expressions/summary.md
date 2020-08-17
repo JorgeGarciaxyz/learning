@@ -107,4 +107,167 @@ Youy cant use auto increments of java and C `i++` you may use `+=` and `-=`
 
 The only difference between or and || is their precedence, `and` and `or` have the same precedence but && has a higher precedence than ||
 
+## defined?
 
+Returns nil if its argument is not defined. It will returns a description of that argument otherwise.
+
+## Comparing objects
+
+For the negated methods, first ruby will loke for these methods; if not found, will then invoke the negated method and negating the result.
+
+```
+== equal value
+=== Compare each of the items with the target in the when clause of a case statement
+<=> General comparison operator. Return -1, 0 or +1 depending if the receiver is less than, equal to or greater than its argument
+<, <=, >=, >
+=~ Regular expression pattern match
+eql? True if the receiver and argument have both same type and equal values
+qual? True if the receiver and argument have the same object ID
+```
+
+## Case statements
+
+There is two ways to use case
+
+1
+```ruby
+case
+  when song.name == "Misty"
+  ...
+end
+```
+
+2
+```ruby
+case command
+  when "debug"
+    ...
+  when "meep"
+    ...
+end
+```
+
+You can also assign the result to a variable (like ifs statements)
+
+The test of each case statement is done using comparison `===` target.
+The operator is defined in class `Class`.
+
+# Loops
+
+## While
+Executes as long as its condition is true.
+
+## Until
+
+Is the opposite, executes the body until the condition becomes true.
+
+If the statement they are modifying (while) is a begin ... end block, the code in the block will always execute at least one time, regardless of the value of the boolean expression
+
+
+# Iterators
+
+Ruby doesnt have a for loop, at least not the kind that iterates over a range of numbers.
+Instead, Ruby uses methods defined in various built-in classes to provide equivalent but less error prone functionality.
+
+examples:
+
+```ruby
+# Traditional for i-0 til 9
+0.upto(0) do |x|
+  print x
+end
+
+# O to 12 by 3
+0.step(12, 3) { |x| print x }
+
+# On arrays
+[].each...
+```
+
+Once a class supports each, the additional methods in the `Enumerable` module become available.
+
+The most basic loop of all, Ruby provides a built-in iterator called loop:
+
+```ruby
+loop do
+  # block
+end
+```
+
+The loop iterator calls the associated block forever until you break out of the loop.
+
+As long as you class defines a sensible each method, you can use a for loop to traverse its objects.
+
+```ruby
+class Periods
+  def each
+    yield "Classical"
+    yield "Jazz"
+    yield "Rock"
+  end
+end
+
+periods = Periods.new
+
+for genre in periods
+  puts genre
+end
+```
+
+## Brea, redo and next
+The loop control constructs break, redo and next, let you alter the normal flow through a loop or iterator.
+
+**break** terminates the enclosing loop
+**redo** repeats the current iteration of the loop from the start but without reevaluating the condition or fetching the next element
+**next** skips to the end of the loop, starting the next iteration
+
+Break will not return anything unless it is returned `break(line)`
+
+## Variable Scope, Loops, and Blocks
+
+The `while, until and for loops` will not introduce new scope; previously existing locals can be used in the loop and any new locals created will be available afterward.
+
+The scoping rules for blocks (ausch as those used by loop and each) are different.
+Normally, the local variables created in these blocks are not accessible outside the block.
+
+```ruby
+[].each do { |x| y = x +1 }
+
+[x, y ] # undefined
+```
+
+If at the time the block executes a local variable already exists with the same name as that of a variable in the block, the existing local variable will be used in the block.
+Its value will therefore be available after the block finishes.
+This applies to normal variables in the block but not to the block parameters.
+
+```ruby
+x = "meep"
+y = "meep2"
+[1, 2].each do |x|
+  y = x + 1
+end
+
+[x, y]  # => [meep, 4]
+```
+
+The variable doesnt have to be executed. The Ruby interpreter just needs to have seen that the variable exists on the left side of an assignment:
+
+```ruby
+a = "never used" if false
+[99].each do |i|
+  a = i
+end
+
+a # => 99
+```
+
+You can list block-local variables in the blocks parameter list preceded by a semicolon.
+
+```ruby
+total = 0
+[99].each do |i; meep|
+  meep = i
+  total = i
+end
+
+[meep, total] # => [99, 99]
