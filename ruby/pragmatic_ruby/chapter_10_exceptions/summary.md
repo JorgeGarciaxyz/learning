@@ -111,3 +111,45 @@ rescue RetryException => details
 end
 ```
 
+## Catch and throw
+
+Catch defines a block that is labeled with the given name (symbol or string).
+The block is executed normally until a throw is encountered.
+
+When Ruby encounters a throw it zips back up the call stack looking for a catch block with
+a matching symbol. When it fins it, Ruby unwinds the stack to that point and terminates the block.
+If the throw is called with the optional second parameter, that value is returned as the value
+of the catch.
+
+```ruby
+word_list = File.open
+word_in_error = catch(:done) do
+  result = []
+  while line = word_list.gets
+    word = line.chomp
+    throw(:done, word) unless word =~ //
+    result << word
+  end
+  puts result.reverse
+end
+
+if word_in_error
+  puts "Failed: #{word_in_error}, found but a word was expected"
+end
+```
+
+The throw does not have to appear within the static scope of the catch.
+
+```ruby
+def prompt_and_get(prompt)
+  print prompt
+  res = readline.chomp
+  throw :quit_requested if res == "!"
+  res
+end
+
+catch :quit_requested do
+  name = prompt_and_get
+  age = prompt_and_get
+end
+```
