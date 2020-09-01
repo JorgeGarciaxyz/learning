@@ -76,5 +76,56 @@ IO.foreach("testfile") { |line| puts line }
 
 ## What is dis doing?
 
-Every object you pass to `puts` and `print` is converted to a string by calling that object `to_s` method.
-If for some reason the `to_s` method doesnt return a valid string a string is created containing the object's class name and ID.
+Every object you pass to `puts` and `print` is converted to a string by calling that
+object `to_s` method.
+
+If for some reason the `to_s` method doesnt return a valid string a string is created
+containing the object's class name and ID, something like `<ClassName:0x123456>`
+
+### Binary Data
+You can use `sysread` and `syswrite` to manage i/o of binary stuff.
+How do you get the binary data into a string in the first place?
+- literal
+- byte by byte
+- Array#pack
+
+```ruby
+str1 = "\001\002\003" # => "\u001\u002\u003"
+
+str2 = ""
+str2 << 1 << 2 << 3 # => "\u001\u002\u003"
+
+[1, 2, 3].pack("c*") # => "\x01\x02\x03"
+```
+
+# Doing I/O with String
+
+There are some times where you need to work with code that assumes it's reading from or
+writing to one or more files but the data isn't in files (like json, soap).
+
+`StringIO` objects. They behave just like other I/O objects but they read and write strings,
+not files.
+
+- If you open a `StringIO` object for reading, you supply it with a string
+- All read operations then read from this string
+- When you want to write to a `StringIO` object, you pass it a string to be filled
+
+```ruby
+require 'stringio'
+ip = StringIO.new("now is\nthe time\nto learn\nRuby!")
+op = StringIO.new("", "w")
+
+ip.each_line do |line|
+  op.puts line.reverse
+end
+
+op.string # => "\nsi won\n\nemit eht\n\nnrael ot\n!ybuR\n"
+```
+
+# Talking to networks
+
+Ruby comes with a set of classes in the socket library.
+These give you access to TCP, UDP, SOCKS and UNix domain sockets and any socket types
+supported on your architecture.
+
+The library also provides helper classes to make writing server easier.
