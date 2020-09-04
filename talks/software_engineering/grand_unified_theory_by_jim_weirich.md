@@ -74,3 +74,40 @@ User objects, complex
 ### Simple Data
 Integers, strings, primitives, etc.
 
+# Recommended lecture
+
+What every programmer should know about object oriented design - Meilir Page-Jones
+
+Part 3 Design principles of object oriented design
+
+# Connascence
+
+Things that are born together and raise together.
+
+Two pieces of software share _connascence_ when a changes in one requires a
+corresponding change in the other.
+
+## Connascence of name
+
+```ruby
+class Customer
+  def email; end
+end
+
+def send_mail(customer)
+  customer.email
+  ...
+end
+```
+
+^ email is the connascence, _connascence of name_
+
+If you rename the method email, you must change every .email reference.
+
+This can exists between your code or things that are not your code, for example
+`email` on the database schema.
+
+There is also a connascence between the parameter `customer` and the usage of this.
+Connascence can live everywhere.
+
+continue watching on min 21:49
