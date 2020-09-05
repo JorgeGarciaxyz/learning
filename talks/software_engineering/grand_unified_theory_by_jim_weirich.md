@@ -111,3 +111,109 @@ There is also a connascence between the parameter `customer` and the usage of th
 Connascence can live everywhere.
 
 continue watching on min 21:49
+
+### Locality matters
+
+If you have a module who interacts within itself the connascence would be high. This is ok
+
+What we want to prevent is to have a stronger connascence within different modules.
+
+### Rule of Locality
+
+As the distance between software elements increases, use weaker forms of connascence.
+
+# Connascence of Position
+
+```ruby
+orders = {
+  "3" => "1",
+  "5" => "2"
+}
+
+def process_orders(list_of_pairs)
+  list_of_pairs.each do |order, expedite|
+    # handle order
+  end
+end
+
+def build_order_list(params)
+  [order, flag]
+end
+
+[[Order.find(3), true], [Order.find(5), false]]
+```
+
+The connascence is determined by the position of the structure.
+
+Is ok with a pair BUT what if we have 6 items ? High degree of CoP (high coupling)
+
+You can solve this replacing CoP with CoN using an object for this.
+
+**CoN < CoP**
+
+#### The number of parameters sent to a function
+
+Anywhere between 1-3/4ish parameters are ok, up to 4 is where things start getting messy.
+
+`find(conditions, order, limit, offset, select)`
+
+You can change this from CoP to CoN
+
+```ruby
+Customers.find(conditions: [], order_by:, limit:, offset:, select:)
+
+def find(options={}); end
+```
+
+Other example (really simple)
+
+```ruby
+def test_user_can_do_something
+  user = User.first
+  ...
+end
+
+# wrong ! CoP
+# solution
+user = User.find_by_name("Jim")
+```
+
+# Connascence of Meaning (CoM)
+
+```html
+<input type="checkbox" value="2" /> # this displays a red X
+<input type="checkbox" value="1" /> # this displays a green check
+```
+
+```ruby
+# there is no real meaning on why the 1 means mark and the 2 means not mark
+if params[:med][id] == "1"
+  mark_given(id)
+elsif params[:med][id] == "2"
+  mark_not_given(id)
+end
+```
+
+If you change the HTML you'll also need to change the ruby code (high level of CoM)
+
+CoM -> CoN
+
+```ruby
+MED_GIVEN = "1"
+MED_NOT_GIVEN = "2"
+
+<input type="checkbox" value="<%= MED_GIVEN %>"/>
+<input type="checkbox" value="<%= MED_NOT_GIVEN %>"/>
+
+if params[:med][id] == MED_GIVEN
+  mark_given(id)
+elsif params[:med][id] == MED_NOT_GIVEN
+  mark_not_given(id)
+end
+```
+
+Continue on 32:29
+
+### Rule of Degree
+
+Convert high degrees of connascence into weaker forms of connascence
