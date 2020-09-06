@@ -2,6 +2,8 @@
 
 [Link to the talk](https://www.youtube.com/watch?v=NLT7Qcn_PmI)
 
+[Some other references](https://dzone.com/articles/about-connascence)
+
 Acts as Conference 2009
 
 # Coupling & Cohesion
@@ -212,8 +214,84 @@ elsif params[:med][id] == MED_NOT_GIVEN
 end
 ```
 
-Continue on 32:29
+# Contranascence
+
+When elements are required to differ from each other (have different names)
+
+```ruby
+# xml library
+class Node; end
+
+# graphing library
+class Node; end
+
+### Solution Use modules
+module MyXML
+  class Node; end
+end
+
+module Graphing
+  class Node; end
+end
+```
+
+Other example
+
+```ruby
+# XML wants to implement this
+module Kernel
+  def to_node; end
+end
+
+
+# Graphing wants to implement this
+module Kernel
+  def to_node; end
+end
+```
+
+Pls dont do that, avoid interacting with global classes like that.
+
+# Connascence of Algorithm (CoA)
+
+```ruby
+add_check_digit("31415972") -> 314159728
+
+check?(314159728) # -> true
+check?(314159722) # -> false
+
+def add_check_digit(digits)
+  check_sum = digits.split(//).inject(0) { |r, n| r + n.to_i } % 10
+  digits + ((10 - check_sum) % 10).to_s
+end
+
+def check?(digits)
+  check_sum = digits.split(//).inject(0) { |r, n| r + n.to_i } % 10
+  check_sum == 0
+end
+```
+
+You use CoN to solve this
+CoA -> CoN
+
+```ruby
+def add_check_digit(digits)
+  digits + ((10 - check_sum) % 10).to_s
+end
+
+def check?(digits)
+  check_sum(digits) == 0
+end
+
+def check_sum(digits)
+  check_sum = digits.split(//).inject(0) { |r, n| r + n.to_i } % 10
+end
+```
+
+### DRY
+The DRY principle it's based on Connascence principles.
 
 ### Rule of Degree
-
 Convert high degrees of connascence into weaker forms of connascence
+
+Continue on 41:11
