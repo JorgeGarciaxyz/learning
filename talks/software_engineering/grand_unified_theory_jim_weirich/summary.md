@@ -4,6 +4,8 @@
 
 [Some other references](https://dzone.com/articles/about-connascence)
 
+Fundamentals of Object-Oriented Design in UML - Meilir Page-Jones
+
 Acts as Conference 2009
 
 # Coupling & Cohesion
@@ -123,6 +125,13 @@ What we want to prevent is to have a stronger connascence within different modul
 ### Rule of Locality
 
 As the distance between software elements increases, use weaker forms of connascence.
+
+### DRY
+The DRY principle it's based on Connascence principles.
+
+### Rule of Degree
+Convert high degrees of connascence into weaker forms of connascence
+
 
 # Connascence of Position
 
@@ -287,11 +296,3 @@ def check_sum(digits)
   check_sum = digits.split(//).inject(0) { |r, n| r + n.to_i } % 10
 end
 ```
-
-### DRY
-The DRY principle it's based on Connascence principles.
-
-### Rule of Degree
-Convert high degrees of connascence into weaker forms of connascence
-
-Continue on 41:11
