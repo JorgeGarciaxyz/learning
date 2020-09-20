@@ -129,3 +129,78 @@ These give you access to TCP, UDP, SOCKS and UNix domain sockets and any socket 
 supported on your architecture.
 
 The library also provides helper classes to make writing server easier.
+
+```ruby
+require "socket"
+
+client = TCPSocket.open("localhost", "www")
+client.send("OPTIONS /~dave/ HTTP/1.0\n\n", 0) # 0 means standard packet
+puts client.readlines
+client.close
+```
+
+The lib/bet library modules provides handlers for a set of application level protocols
+(FTP, HTTP, POP, SMTP, telnet).
+The next program lists the images that are displayed on this books home page.
+
+```ruby
+require "net/http"
+
+http = Net::HTTP.new("meeep.com", 80)
+response = http.get("/book/12")
+
+if response.message == "OK"
+  puts response.body.scan(/<img alt=".*?" src="(.*?)"/m).uniq[0,3]
+end
+```
+
+We can take this to a higher level still. By using the open-uri library into a program
+the `Object#open` method suddengly recognizes `http` and `ftp` in the filename.
+
+```ruby
+require "open-uri"
+
+open('http://pragprog.com') do |f|
+  puts f.read.scan(/<img alt=".*?" src="(.*?)"/m).uniq[0,3]
+end
+```
+
+# Pasing HTML
+
+The nokogiri library is very popular. It's a very rich library
+
+```ruby
+require 'open-uri'
+require 'nokogiri'
+
+doc = Nokogiri::HTML(open("http://pragprog.com/"))
+
+puts "Page title is " + doc.xpath("//title").inner_html
+
+# Output the first paragraph in the div with an id="copyright"
+# (nokogiri supports both xpath and css-like selectors)
+puts doc.css('div#copyright p')
+
+# Output the second hyperlink in the site-links div using xpath and css
+puts "\nSecond hyperlink is"
+puts doc.xpath('id("site-links")//a[2]')
+puts doc.css('#site-links a:nth-of-type(2)')
+```
+
+This produces
+```
+produces:
+Page title is The Pragmatic Bookshelf
+<p>
+The <em>Pragmatic BookshelfTM</em> is an imprint of
+<a href="http://pragprog.com/">The Pragmatic Programmers, LLC</a>.
+<br>
+Copyright © 1999–2013 The Pragmatic Programmers, LLC.
+All Rights Reserved.
+</p>
+Second hyperlink is
+<a href="http://pragprog.com/about">About Us</a>
+<a href="http://pragprog.com/about">About Us</a>
+```
+
+Nokogiri can also update and create HTML and XML
