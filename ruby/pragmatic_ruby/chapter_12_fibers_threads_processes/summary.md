@@ -107,3 +107,88 @@ requests.
 A continuation is created when the app sends a response to the browser; then, when the
 next request arrives from that browser, the continuation is invoked and the application
 continues from where it left off.
+
+# Multithreading
+
+The simplest way to do two things at once is to use Ruby threads. Since ruby 1.9 the
+threading is done by the OS.
+
+Many Ruby extension libraries are not thread safe, because they were written for the old
+threading model.
+Ruby compromises: it uses native OS threads but operates a single thread at a time.
+
+You'll never see two threads in the same application running Ruby code truly
+concurrently.
+
+You will see however see threads busy doing I/O while another thread executes RubyCode.
+
+## Creating Ruby threads
+
+For each URL that is asked to download, the code creates a separate thread that handles
+HTTP transaction.
+
+```ruby
+require "net/http"
+
+pages = %w(www.rubycentral.org slashdot.org www.google.com)
+
+threads = pages.map do |page_to_fetch|
+  Thread.new(page_to_fetch).do |url|
+    http = Net::HTTP.new(url, 80) # this block will run in a new thread
+    print "Fetching: #{url}\n"
+
+    resp = http.get("/")
+    print "got #{url}: #{resp.message}\n"
+  end
+end
+
+threads.each { |thr| thr.join }
+
+# produces
+# Fetching: www....
+# Fetching: www....
+# Fetching: www....
+
+# Got www.google.com: OK
+# Got slashdot.com: OK
+# Got www.rubycentral.com: OK
+```
+
+Why we send the URL as a parameter to the block?
+A thread shares all global instance and local variables that are in existence at the time
+the thread starts.
+In this case, all three threads would share the variable page_to_fetch.
+
+1. The first thread gets started and page_to_fetch is ruby central, the loop creating the
+threads is still running.
+
+2. The second time, page_to_fetch gets set to slashdot.org. If the first thread has not
+yet finished using the page_to_fetch variable, it will suddenly start using this new
+value.
+
+Local variables created within a Thread's block are truly local to that thread.
+Each thread will have its own copy of these variables. In our case, the variable url
+will be set at the time the thread is created and each thread will have its own copy of
+the page address. You can pass any number of arguments into the block.
+
+This thread do not uses puts. Why?, puts splits its work into two chunks:
+- it writes its argument
+- it writes a new line
+Between these two, a thread could get scheduled and the output would be interleaved.
+Calling print with a new line solves the problem.
+
+### Why we call join at the end?
+
+When a Ruby program terminates, all threads are killed regardless of their states.
+You can wait for a particular thread to finish by calling that thread's `Thread#join`.
+The calling thread will block until the given thread is finished.
+By calling `join` on each of the requester threads, you can make sure that all three
+requests have completed before you terminate the main program.
+Another variant is the Thread#value, returns the value of the last statement executed by
+the thread.
+
+You can access the current thread using .current, a list of them using `Thread.list`,
+and to determine the status you can use `Thread#status?` and `Thread#alive?`.
+
+You can adjust the prioirty using `Thread#priority=`. The higher threads will run before
+lower-priority threads.
