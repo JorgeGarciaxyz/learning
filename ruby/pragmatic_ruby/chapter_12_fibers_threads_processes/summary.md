@@ -192,3 +192,100 @@ and to determine the status you can use `Thread#status?` and `Thread#alive?`.
 
 You can adjust the prioirty using `Thread#priority=`. The higher threads will run before
 lower-priority threads.
+
+## Thread variables
+
+A thread can access any variables in the scope.
+Variables local to the block containing the thread are local and not shared.
+
+You can define variables that can be accesed to other Threads, these are accessed like
+a hash containing the variables.
+
+The next code contains a race condition
+
+```ruby
+count = o
+
+thrads = 10.times.map do |i|
+  Thread.new do
+    sleep(rand(0.1))
+    Thread.current[:mycount] = count
+    count +=1
+  end
+end
+
+thrads.each { |t| t.join; print t[:mycount], ", " }
+puts "count = #{count}"
+```
+
+produces
+`7, 0, 6, 8, 4, 5, 1, 9, 2, 3, count = 10`
+
+The main thread waits for the subthreads to finish and then prints that thread's value
+of `count`.
+
+## Threads and Exceptions
+
+When a thread raised an unhandled exception depends of the setting of `abor_on_exception`
+flag and on the setting of the interpreter's $DEBUG flag.
+
+If both are false (default) an unhandled exception kills the current thread and the rest
+will run. You don't even hear about the exception until you issue a `join` on the thread.
+
+### Controlling the Thread Scheduler
+
+In a well designed software you'll normally just let threads do their thing;
+Building timing dependencies into a Multithreading app is considered a bad form. Bc it
+makes the code far more complex and prevent the thread scheduler from optimizing the
+execution of ur program.
+
+`Thread.stop` stops the current thread.
+`Thread#run` arranges for a particular thread to be run
+`Thread.pass` deschedules the current thread allowing others to run and `join` and `value`
+suspend the calling thread until a given thread finishes.
+
+Tldr; only use the last two. Dont use any other low level methods.
+
+### How to solve race conditions
+
+Use `Mutex` this synchronize regions, areas of code that only one thread may enter at a time.
+
+You create a mutex to control access to a resource and lock it when you want to use that.
+If no one else has it locked, your thread continues to run.
+If someone else has already locked that particular mutex, your thread suspends until they
+unlock it.
+
+# Queues and condition variables
+
+Ruby comes with a useful library when you need to synchronize work between producers and
+consumers. The `Queue` class localted in the thread library.
+Implements a thread-safe queueing mechanism.
+
+Multiple threads can add and remove objects from each queue and each addition and removal
+is guaranteed to be atomic.
+
+A condition variable is a controlled way of communicating an event between two threads.
+One thead can wait on the condition and the other can signal it.
+
+## Running multiple processes
+
+### Spawning new processes
+
+You have several ways to spawn a separate process; The easies is to run some command
+and wait for it to complete.
+
+You may find yourself doing this to run some separate command or retrieve data from the
+host system. Ruby does this for you with the system and backquote (or backtick methods).
+
+```ruby
+system("tar xzf test.tgz") # => true
+
+`date` # => Monday....
+```
+
+The method `Object#system` executes the given command in a subprocess; it returns true
+if the command was found and executed properly. It raises and exception if not. It return
+false if the command ran but returned an error.
+
+To capture the standard output if a subprocess you can use the backquote characters. You
+may need to use `String#chomp` to remove the line-ending characters from the result.
