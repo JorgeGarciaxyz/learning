@@ -289,3 +289,99 @@ false if the command ran but returned an error.
 
 To capture the standard output if a subprocess you can use the backquote characters. You
 may need to use `String#chomp` to remove the line-ending characters from the result.
+
+The problem with `system` is that the commands output will simply go to the same
+destination as your programs outpit, which may not be what you want.
+To capture the standard output of a subprocess you can use the backquote characters.
+
+
+What if we want to send some data to the system and getting some back?
+
+#### IO.popen
+
+The method `IO.popen` does this. Runs a command as a subprocess and connect that standard
+input and standard outpout to a Ruby IO object. Write to the IO obj and the subprocess
+can read it on standard input. Whatever the subprocess writes is available in the Ruby program
+by reading the IO obj.
+
+```ruby
+pig = IO.popen("local/util/pig", "w+")
+pig.puts "ice cream after they go to bed"
+pig.close_write
+puts pig.gets
+```
+produces
+```
+iceway eamcray afterway eythay ogay otay edbay
+```
+
+We need to flush the output it writes. We had to insert the .close_write line.
+This sends an end-of-life to pigs standard input and the output get flushed as pig termiantes.
+
+If the command you pass to `popen` is a single minus sign, this will fork a new Ruby
+interpreter. Both this and the original interpreter will continue runnin by returning from
+the popen.
+The original process will receive an IO object back and the child will receive nil.
+
+### Independent Children
+
+Sometimes we dont want to mess with things. We'd like to give the subprocess its
+assignment and then go on about our business.
+
+```ruby
+exec("sort testfile > output.txt") if fork.nil?
+
+# The sort is running a child process
+
+# Then wait
+Process.wait
+```
+
+The call to `Object#fork` returns a process returns a process ID in the parent and nil
+in the child. So the child will perform the `Object#exec` and run sort. Process.wait
+will wait for the sort to complete and return the ID.
+
+You can also be notified if the child exits using `Object#trap`
+
+```ruby
+trap("CLD") do
+  pid = Process.wait
+  puts "child terminated #{pid}"
+end
+
+fork { exec("sort...") }
+```
+
+### Blocks and Subprocesses
+
+`IO.popen` works with a block as the same way `File.open` does. You pass a command such
+as date, the block will be passed an IO object as parameter.
+
+```ruby
+IO.popen("date") {|f| puts "Date is #{f.gets}" }
+```
+produces:
+```
+Date is Mon May 27 12:31:17 CDT 2013
+```
+
+The IO object will be closed automatically when the code block exits.
+
+If you associate a block with a fork, the code inside the block will be run in a Ruby
+subprocess and the parent will continue after the block.
+
+```ruby
+fork do
+  puts "In child, pid = #$$"
+  exit 99
+end
+pid = Process.wait
+puts "Child terminated, pid = #{pid}, status = #{$?.exitstatus}"
+```
+produces:
+```
+in child, pid = 22033
+Child terminated, pid = 22033, status = 99
+```
+
+* $? is a global variable that contains information on the termination of a subprocess.
