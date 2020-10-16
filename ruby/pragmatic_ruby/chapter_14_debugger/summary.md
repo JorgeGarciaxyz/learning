@@ -17,3 +17,26 @@ The debugger supports:
 You can run ruby using your editor, for example using vi `:%!ruby` which replaces the
 program text with its output or `:w_!ruby` which displays the output without affecting
 the buffer.
+
+## But is doesn't work
+
+- Run your scripts with warnings enabled (the -w command-line option)
+- An attribute setter is not being called. Within a class definition, Ruby will parse
+  setter= as an assignment to a local variable, not as a method call. Use self.setter=
+- Objects that don't appear to be properly setup may have been vistims of an incorrectly
+  spelled initialize method
+
+```ruby
+class Incorrect
+  attr_reader :answer
+
+  def initialise
+    @answer = 42
+  end
+end
+
+ultimate = Incorrect.new
+ultimate.answer # => nil
+```
+The same will happen if you misspell the instance variable name.
+
