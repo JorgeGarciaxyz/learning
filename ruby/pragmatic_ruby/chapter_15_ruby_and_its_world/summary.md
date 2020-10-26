@@ -101,3 +101,16 @@ the corresponding env variables. However this changes is local to the process th
 it and to any subsequently spawned child processes.
 
 The changes made on the sub processes are not visible to the og parent.
+
+## 15.4 Where Ruby find its Libraries
+
+When Ruby is built for your particular machine, it predefines a set of standard
+directories to hold libreary stuff. Where these are depends on the machine in question.
+`ruby -e 'puts $:'`
+
+The `site_ruby` directories are intender to hold modules and extensions that you've added.
+
+Sometimes this isn't enough. For example if someone built a substantial library of Ruby
+code you want everyone on the team to hace access to this.
+If your program runs at a safe level of zero you can set the environment variable RUBYLIB
+to a list of one or more directories.
