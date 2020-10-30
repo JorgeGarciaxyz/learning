@@ -114,3 +114,27 @@ Sometimes this isn't enough. For example if someone built a substantial library 
 code you want everyone on the team to hace access to this.
 If your program runs at a safe level of zero you can set the environment variable RUBYLIB
 to a list of one or more directories.
+
+## Reading Gem documentation
+
+The most reliable way to find the documents is to ask the gem command where your RubyGem
+main directory is located:
+
+`gem environment gemdir`
+
+The easiest way to view gem's RDoc documentation is to use RubyGem's included gem server
+utility, to start gem server type
+
+`gem server`
+
+### Specify gem version
+
+If you need to specify an speific version you can use:
+
+```ruby
+gem "builder", "< 1.0"
+
+require "builder"
+```
+
+## 15.6 The Rake Build Tool
