@@ -138,3 +138,69 @@ require "builder"
 ```
 
 ## 15.6 The Rake Build Tool
+
+Rake is an automation tool. Think of rakes as tasks, a chunk of code that Rake can
+execute for us.
+
+Rake searches the current directory for a file called Rakefile. This file contains
+definitions for the tasks that Rake can run.
+
+Ex:
+
+```ruby
+desc "Remove files whose names end with a tilde"
+
+task :delete_unix_backups do
+  files = Dir['*~']
+  rm(files, verbose: true) unless files.empty?
+end
+```
+
+Althought this doesn't have an .rb extension, this is actually just a file of Ruby code.
+
+Rake defines an environment containing methods such as desc and task and then executes
+the Rakefile.
+
+The desc method provides a single line of documentation for the task that follows it.
+The task method defines a Rake task that can be executed from the command line.
+
+We can invoke this task from the command line
+`rake delete_unix_backups`
+
+Let's say that our application could be used on windows and unix, Rake give us a way to
+do this, let us `compose` tasks. Here's an example:
+
+```ruby
+desc "Remove Unix and Windows backup files"
+task :delete_backups => [:delete_unix_backups, :delete_windows_backups] do
+  puts "all backups deleted"
+end
+```
+
+The task depens on two other tasks. We pass the task method a Ruby hash containing a
+single entry whose key is the task name and whose value is the list of antecedent tasks.
+
+This causes Rake to execute the two platform-specific tasks before executing the delete
+backup task.
+
+You can also define `Ruby methods` on the Rakefile
+
+You can find the tasks implemented by a Rakefile
+
+`rake -T`
+
+## 15.7 Build Environment
+
+When Ruby is compiled for a particular architecture all the settings used to build it
+are written to the module RbConfing within the library file `rbconfig.rb`.
+
+After installation, any Ruby program can use this module to get details on how Ruby was
+compiled:
+
+```ruby
+require "rbconfig"
+
+include RbConfig
+CONFIG["host"] # => Linux..
+CONFIG["libdir"] # => users/...
+```
