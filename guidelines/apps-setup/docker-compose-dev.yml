@@ -1,0 +1,15 @@
+version: '3'
+volumes:
+  dbdata:
+services:
+  postgres:
+    container_name: your_app_development
+    image: postgres:alpine
+    ports:
+      - '31027:5432'
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=your_app_development
+    volumes:
+      - 'dbdata:/var/lib/postgresql/data'
