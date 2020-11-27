@@ -94,3 +94,37 @@ Most config values are available while you're running `irb`
 ### irb Configuration Options
 
 review this https://docs.ruby-lang.org/en/2.7.0/IRB.html
+
+## 18.2 Commands
+
+`help ClassName, string or symbol`
+Displays the ri help for the given thing
+
+```ruby
+help "String.encoding"
+```
+
+`conf, context, irb_context`
+Displays current Configuration. Modifying the configuration is achieved by invoking
+methods of conf.
+
+`cb, irb_change_binding`
+Creates and enters a new binding (sometimes called a workspace) that has its own scope.
+
+### Configuring the Prompt
+
+Sets of prompts are stored in the prompt hash, IRB.conf[:PROMPT].
+Once you’ve defined a prompt, you have to tell irb to use it. From the command line, you
+can use the --prompt option.
+
+`irb --prompt my=prompt`
+
+### Saving Your Session History
+
+If you have readline support in irb (that is, you can hit the up arrow key and irb recalls
+the previous command you entered), then you can also configure irb to remember the commands
+you enter between sessions. Simply add the following to your .irbrc file:
+
+```
+IRB.conf[:SAVE_HISTORY] = 50
+```
