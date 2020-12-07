@@ -151,3 +151,93 @@ end
 
 Class variables belong to the innermost enclosing class or module. Class variables used at
 the top level are defined in Object and behave like global variables.
+
+### Exception information
+
+page 311
+
+### Pattern matching variables
+
+`$& -> String`
+The string matched (following a successful pattern match). This variable is local to the
+current scope.
+
+More on page 312
+
+### I/O variables
+
+`$/ → String`
+
+The input record separator (newline by default). This is the value that routines such as
+Object#gets use to determine record boundaries. If set to nil , gets will read the entire file.
+
+More on page 312
+
+### Execution Environment Variables
+
+`$0 → String`
+
+The name of the top-level Ruby program being executed. Typically this will be the
+program’s filename. On some operating systems, assigning to this variable will change
+the name of the process reported (for example) by the ps(1) command.
+
+More on page 313
+
+### More of this
+
+Standard Objects, global constants page 315
+
+## 22.6 Expressions, Conditionals and Loops
+
+Single terms in an expression may be any of the following:
+
+- Literal: numbers, strings, arrays, etc...
+
+- Shell command: a string enclosed in backquotes or in a general delimited string starting
+  with `%x`. The string is executed using the host operating system's standard shell.
+  The resulting standard output stream if returned as the value of the expression.
+
+### Parallel Assignment
+
+- If any rvalue is prefixed with an sterisk and implements `to_a` the rvalue is replaced
+  with the elements returned by `to_a` with each element forming its own rvalue
+- If the assignment contains one lvalue and multiple rvalues, the rvalues are converted
+  to an array and assigned to that lvalue.
+- If the assignment contains multiple lvalues and one rvalue the rvalue is expanded if
+  possible into an array of rvalues.
+- Successive rvalues are assigned to the lvalues. This happens in parallel so `a,b = b,a`
+  swaps the values in a and b
+- If there are more lvalues than rvalues the excess will have nil assigned to them.
+- If there are more rvalues than lvalues the excess will be ignored.
+
+### defined?
+
+The defined? keyword returns nil if its argument, which can be an arbitrary expression, is not
+defined. Otherwise, it returns a description of that argument.
+
+
+### Ranges in Boolean Expressions
+
+`if expr1 .. expr2`
+`while expr1 .. expr2`
+
+A range used in a boolean expression acts as a flip-flop. It has two states, set and unset, and
+is initially unset.
+
+1. For the three-dot form of a range, if the flip-flop is unset and expr1 is true, the
+flip-flop becomes set and then the flip-flop returns true.
+2. If the flip-flop is set, it will return true. However if expr2 is not true, the
+flip-flop becomes unset.
+3. If the flip-flop is unset it returns false.
+
+The first step differs for the two-dot form of a range. If the flip-flop is unset and expr1 is true,
+then Ruby only sets the flip-flop if expr2 is not also true.
+
+The difference is illustrated by the following code:
+```ruby
+a = (11..20).collect {|i| (i%4 == 0)..(i%3 == 0) ? i : nil}
+a # => [nil, 12, nil, nil, nil, 16, 17, 18, nil, 20]
+
+a = (11..20).collect {|i| (i%4 == 0)...(i%3 == 0) ? i : nil}
+a # => [nil, 12, 13, 14, 15, 16, 17, 18, nil, 20]
+```
