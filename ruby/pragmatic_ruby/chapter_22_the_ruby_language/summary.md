@@ -241,3 +241,104 @@ a # => [nil, 12, nil, nil, nil, 16, 17, 18, nil, 20]
 a = (11..20).collect {|i| (i%4 == 0)...(i%3 == 0) ? i : nil}
 a # => [nil, 12, 13, 14, 15, 16, 17, 18, nil, 20]
 ```
+
+## 22.7 Method definition
+
+There are multiple ways to define methods
+
+```ruby
+class MyClass
+  def MyClass.method # definition
+  end
+end
+
+MyClass.method       # call
+
+obj = Object.new
+def obj.method       # definition
+end
+
+obj.method           # call
+
+def (1.class).fred   # receiver may be an expression
+end
+
+Fixnum.fred          # call
+```
+
+### Keyword args
+
+If you define a double splat argument, `**arg` this will be set up as a hash containing
+any uncollected keywoed parameters passed to the method.
+`def header(name, **atrs)`
+
+### Block argument
+
+The optional block argument must be the last in the list. Whenever the method is called,
+Ruby checks for an associated block. If a block is present, it is converted to an object of class
+Proc and assigned to the block argument. If no block is present, the argument is set to nil.
+
+```ruby
+def example(&block)
+end
+```
+
+### Undefining a Method
+
+The keyword `undef` allows you to undefine a method.
+An undefined method still exists; it is simply marked as being undefined.
+If you undefine the method and call that method it would raise a `NoMethodError` error.
+
+## 22.8 Invoking a method
+
+Any parameter with an asterisk it would call `.to_a` and pass the array expanded as params.
+
+Any parameter may be prefixed with two asterisks (a double splat). Such parameters are
+treated as hashes, and their key-value pairs are added as additional parameters to the method
+call.
+
+When a receiver is explicitly specified in a method invocation, it may be separated from the
+method name using either a period ( . ) or two colons ( :: ). The only difference between these
+two forms occurs if the method name starts with an uppercase letter. In this case, Ruby will
+assume that receiver::Thing is actually an attempt to access a constant called Thing in the
+receiver unless the method invocation has a parameter list between parentheses. Using :: to
+indicate a method call is mildly deprecated.
+
+```ruby
+Foo.Bar()  # method call
+Foo.Bar    # method call
+Foo::Bar() # method all
+Foo::Bar   # constant access
+```
+
+## 22.10 Classes
+
+Class Class defines the instance method Class#new , which creates an instance of the class of
+its receiver (classexpr). This is done by calling the method classexpr `.allocate`
+
+If a class definition overrides the class method new without calling super , no objects of that
+class can be created, and calls to new will silently return nil .
+
+## 22.11 Module Definitions
+
+A module is basically a class that cannot be instantiated.
+Like a class its body its body is executed during definition, and the resulting
+Module object is stored in a constant.
+
+A module’s class methods (sometimes called module methods) are invoked using the
+Module object as a receiver, and constants are accessed using the :: scope resolution operator.
+The name in a module definition may optionally be preceded by the names of enclosing
+class(es) and/or module(s).
+
+```ruby
+module Mod
+  CONST = 1
+
+  def Mod.method1 # module method
+    CONST+1
+  end
+end
+
+Mod::CONST
+Mod.method1
+```
