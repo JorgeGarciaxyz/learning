@@ -342,3 +342,30 @@ end
 Mod::CONST
 Mod.method1
 ```
+
+### Including modules
+
+A module may be included within the definition of another module or class using the include
+method. The module or class definition containing the include gains access to the constants,
+class variables, and instance methods of the module it includes.
+
+### Module functions
+
+You can call instance methods directly including the module using `module_function`
+
+```ruby
+module Math
+  def sin(x)
+  #
+  end
+
+  module_function :sin
+end
+
+Math.sin(1)
+include Math
+sin(1)
+```
+
+The instance method and module method are two different methods: the method definition
+is copied by module_function, not aliased.
