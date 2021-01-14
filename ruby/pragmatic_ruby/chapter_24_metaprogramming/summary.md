@@ -376,3 +376,69 @@ simply a class method, we can call it inside our class method to define the read
 of our attribute.
 We use `instance_variable_set` to set the value of an instance variable. There's a
 corresponding `_get` method that fecthes the value of a named instance variable.
+
+### Class Methods and Modules
+
+You can use modules to shrink the logic instead of using inheritance, using `extend`
+inside class definition
+
+```ruby
+module AttrLogger
+  def attr_logger(name)
+    attr_reader name
+
+    define_method("#{name}=") do |val|
+      puts "Assigning #{val.inspect} to #{name}"
+      instance_variable_set("@#{name}", val)
+    end
+  end
+end
+
+class Example
+  extend AttrLogger
+  attr_logger :value
+end
+
+ex = Example.new
+ex.value = 123
+# produces: Assigning 23 to value
+```
+
+Things get trickier if you want to add both class methods and instance methods into the
+class being defined. Here's one technique used extensively in the implementation of rails.
+
+It uses ruby `included` hook which is called automatically by ruby when you include a
+module into a class. It is passed the class object of the class being defined:
+
+```ruby
+module GeneralLogger
+  # instance method to be added to any class that include us
+  def log(msg)
+    # meep
+  end
+
+  # module containing class methods to be added
+  module ClassMethods
+    def attr_logger
+      attr_reader name
+
+      define_method {} # etc..
+    end
+  end
+
+  # extend host class with class methods when we're included
+  def self.included(host_class)
+    host_class.extend(ClassMethods)
+  end
+end
+
+class Example
+  include GeneralLogger
+
+  attr_logger :value
+end
+
+ex = Example.new
+ex.log("New example created")
+ex.value = 123
+```
