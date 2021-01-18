@@ -442,3 +442,247 @@ ex = Example.new
 ex.log("New example created")
 ex.value = 123
 ```
+
+## 24.6 Two other Forms of Class Definition
+
+Subclassing expressions
+
+The thing to the right of the `<` needn't be just a class name; it can be any expression
+that returns a Class Object.
+
+The return value from `Struct.new` is c alss object, you can assign this to a constant
+and use it as any other class.
+We can even override any method inside a class defined as struct.
+
+```ruby
+class Person < Struct.new(:name, :address, :likes)
+  def to_s
+    :meep
+  end
+end
+```
+
+### Creating Singleton Classes
+
+You can pass `.new` a block, that block is the body of the class:
+
+```ruby
+some_class = Class.new do
+  def self.class_method
+    :class_method
+  end
+
+  def instance_method
+    :instance_method
+  end
+end
+```
+
+By default, these classes will be direct descendents of `Object`. You can give them a
+different parent by passing the parent's class as a paremeter:
+
+```ruby
+some_class = Class.new(String) do
+  # meep
+end
+```
+
+### How classes get their names
+
+If you create classes with `Class.new` have no name. If you assign the class object for
+a class with no name to a constant, Ruby automatically names the class after the constant.
+
+```ruby
+some_class = Class.new # no name
+SomeClass = some_class # SomeClass name
+```
+
+We can reimplement the Ruby `Struct` class:
+
+```ruby
+def MyStruct(*keys)
+  Class.new do
+    attr_accessor *keys
+
+    def initialize(hash)
+      hash.each do |key, value|
+        instance_variable_set("@#{key}", value)
+      end
+    end
+  end
+end
+```
+
+## 24.7 instance_eval and class_eval
+
+These methods let you set `self` to be some arbitrary object, evaluate the code in a
+block with, and then reset `self`.
+
+```ruby
+"cat".instance_eval do
+  puts "Upper case = #{upcase}"
+  puts "Lenght is #{self.upcase}"
+end
+
+# produces
+# Upper case = CAT
+# Length is 3
+```
+
+This is dangerous:
+First, is also slow. This compiles the code in the string before executing it.
+If there's any chance that external data, can wind up inside the parameter to eval causes
+a security hole, that external data may end up containing arbitrary code that your application
+bindly execute.
+
+
+class_eval sets things up as if you were in the body of a class definition, so method
+definitions will define instance methods:
+
+```ruby
+class MyClass
+end
+
+MyClass.class_eval do
+  def instance_method
+    puts "In an instance method"
+  end
+end
+
+obj = MyClass.new
+obj.instance_method
+```
+
+instance_eval on a class acts as if you were working inside the singleton class of self.
+Therefore, any methods you define will become class methods:
+
+```ruby
+class MyClass
+end
+
+MyClass.instance_eval do
+  def class_method
+    puts "In a class method"
+  end
+end
+
+MyClass.class_method
+```
+
+Ruby also has some variants of these methods:
+- `Object#instance_exec`
+- `Module#class_exec`
+- `Module#module_exec`
+
+### Instance_eval and Domain-Specific Languages
+
+Lets say we're building a simpel DSL for turtle graphics
+
+We can define a class Turtle that defines the various methods we need as instance methods.
+We’ll also define a walk method, which will execute our turtle DSL, and a draw method to
+draw the resulting picture:
+
+```ruby
+class Turtle
+  def left; ... end
+  def right; ... end
+  def forward(n); ... end
+  def pen_up; ... end
+  def pen_down; ... end
+  def walk(...); end
+  def draw; ... end
+end
+
+turtle = Turtle.new
+turtle.walk do
+  3.times do
+    forward(8)
+    pen_down
+    4.times do
+      forward(4)
+      left
+    end
+    pen_up
+  end
+end
+
+turtle.draw
+```
+
+So, what is the correct implementation of walk ? Well, we clearly have to use instance_eval,
+because we want the DSL commands in the block to call the methods in the turtle object.
+
+```ruby
+def walk(&block)
+  instance_eval(&block)
+end
+```
+
+Is this a good use of instance_eval ? It depends on the circumstances.
+The benefit is that the code inside the block looks simple—you don’t have to make the
+receiver explicit:
+
+```ruby
+4.times do
+  turtle.forward(4)
+  turtle.left
+end
+```
+
+There's a drawback, inside the block you cant reference the instance (turtle).
+Instance variables are looked up in `self` and `self` in the block is not the `self` in
+the code that sets the instance variable `@size`.
+
+## 24.8 Hook Methods
+
+`included` method is an example of a hook method (or called callback). A hook method is
+a method that you write but that Ruby calls from within the interpreter when some particular
+event occurs. The interpreter looks for these methods by name.
+
+The methods that can be invoked from within the interpreter are:
+
+**See page 383 of this book**
+
+### The inherited Hook:
+
+If a class defines a class method called `inherited`, Ruby will call it whenever that
+class is subclassed.
+
+This hook if often used in situations where a base class needs to keep track of its
+children.
+
+For example a shop with a class called `Shipping` want to track of all the varios shipping
+options by recording every class that subclasses it.
+When it comes time to display the shipping options to the user, the application could
+call the base class asking for a list of its children:
+
+```ruby
+class Shipping
+  @children = []
+
+  def self.inherited(child)
+    @children << child
+  end
+
+  def self.shipping_options(weight, international)
+    @children.select { |child| child.can_ship(weight, international)}
+  end
+end
+
+class MediaMail < Shipping
+  def self.can_ship(weight, international)
+    !international
+  end
+end
+
+class FlatRatePriorityEnvelope < Shipping
+  def self.can_ship(weight, international)
+    weight < 64 && !international
+  end
+end
+
+puts "\nShipping 90oz domestic"
+puts Shipping.shipping_options(90, false)
+```
+
+### The method_missing Hook
