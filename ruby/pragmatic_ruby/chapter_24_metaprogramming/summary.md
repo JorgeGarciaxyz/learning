@@ -686,3 +686,23 @@ puts Shipping.shipping_options(90, false)
 ```
 
 ### The method_missing Hook
+
+If Ruby doesn't find a method by the time we run out of superclasses, then Ruby tries
+to invoke the hook method `method_missing` on the original object.
+The same process is followed, it first looks in the object's class -> superclass and so on.
+Ruby defined `method_missing` on `BasicObject` so the search stops there.
+
+`Method_missing` is simply a Ruby method, we can override it in our own classes to handle
+calls to otherwise undefined methods.
+
+You can use, for example use the `method_missing` to implement your own `OpenStruct` class,
+if the attribute is not defined, create the attribute.
+
+### Method missing as a Filter
+
+Active record implements their own kind of method missing metaprogramming to define certain
+methods like `find_by_xxxx` or `find_all_by_xxx`.
+
+### Demo of metaprogramming
+
+Implementation of creating a module which traces the method execution, page 389.
