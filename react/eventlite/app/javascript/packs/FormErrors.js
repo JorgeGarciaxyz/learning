@@ -7,7 +7,7 @@ const FormErrors = (props) => (
         return (
           <p>
             {formErrorField} {error}
-            </p>
+          </p>
         );
       });
     })}
