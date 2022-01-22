@@ -7,6 +7,8 @@ import EventForm from "./EventForm";
 import EventsList from "./EventsList";
 import FormErrors from "./FormErrors";
 
+import validations from "../validations";
+
 class Eventlite extends React.Component {
   constructor(props) {
     super(props);
@@ -33,12 +35,13 @@ class Eventlite extends React.Component {
     e.preventDefault();
 
     const name = e.target.name;
+    const value = e.target.value
     const newState = {};
 
     newState[name] = {...this.state[name], value: e.target.value };
     // You can send an optional callback to the setState method to execute a subsequent
     // method after the state is updated.
-    this.setState(newState, this.validateForm);
+    this.setState(newState, () => this.validateField(name, value))
   };
 
   handleSubmit = (e) => {
@@ -72,59 +75,40 @@ class Eventlite extends React.Component {
   }
 
   validateForm() {
-    let formErrors = {};
-    let formValid = true
-
-    if(this.state.location.value.length === 0) {
-      formErrors.location = ["Can't be blank"];
-      formValid = false;
-    }
-
-    if(this.state.title.value.length <= 2) {
-      formErrors.title = ["Tittle is too short (minimum is 3 characters)"];
-      formValid = false;
-    }
-
-    if (this.state.start_datetime.value.length === 0) {
-      formErrors.start_datetime = ["Can't be blank"]
-      formValid = false;
-    } else if (Date.parse(this.state.start_datetime.value) <= Date.now()) {
-      formErrors.start_datetime = ["Can't be in the past"];
-      formValid = false;
-    }
-
-    this.setState(
-      { formValid: formValid, formErrors: formErrors }
-    );
+    this.setState({
+      formValid: this.state.title.valid && this.state.location.valid && this.state.start_datetime.valid
+    });
   }
 
   validateField(fieldName, fieldValue) {
+    let fieldError = '';
     let fieldValid = true;
     let errors = []
+
     switch(fieldName) {
       case "title":
-      if(fieldValue.length <= 2) {
-        // Concat returns a new array wihtout mutating the original one which is more
-        // efficient.
-        errors = errors.concat(["is too short (minimum is 3 characters)"]);
-        fieldValid = false;
+      [fieldValid, fieldError] = validations.checkMinLength(fieldValue, 3)
+      if(!fieldValid) {
+        errors = errors.concat([fieldError]);
       }
       break;
 
       case "location":
-      if(fieldValue.length === 0) {
-        errors = errors.concat(["can't be blank"])
-        fieldValid = false
+      [fieldValid, fieldError] = validations.checkMinLength(fieldValue, 1)
+      if(!fieldValid) {
+        errors = errors.concat([fieldError]);
       }
       break;
 
       case 'start_datetime':
-      if(fieldValue.length === 0) {
-        errors = errors.concat(["can't be blank"])
-        fieldValid = false
-      } else if(Date.parse(fieldValue) <= Date.now()) {
-        errors = errors.concat(["can't be in the past"])
-        fieldValid = false
+      [fieldValid, fieldError] = validations.checkMinLength(fieldValue, 1)
+      if(!fieldValid) {
+        errors = errors.concat([fieldError]);
+      }
+
+      [fieldValid, fieldError] = validations.timeShouldBeInTheFuture(fieldValue)
+      if(!fieldValid) {
+        errors = errors.concat([fieldError]);
       }
       break;
     }
