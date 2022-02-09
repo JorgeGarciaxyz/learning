@@ -22,6 +22,8 @@ class Eventlite extends React.Component {
       start_datetime: { value: "", valid: false},
       formValid: false,
     };
+
+    this.logo = React.createRef()
   }
 
   static formValidations = {
@@ -42,7 +44,12 @@ class Eventlite extends React.Component {
       return new Date(a.start_datetime) - new Date(b.start_datetime);
     });
 
-    this.setState({ events: events });
+    this.setState({ events: events }, this.changeLogoColour);
+  };
+
+  changeLogoColour = () => {
+    const colors = ["red", "blue", "green", "violet"];
+    this.logo.current.style.color = colors[Math.floor(Math.random() * colors.length)]
   };
 
   handleInput = (e) => {
@@ -116,6 +123,7 @@ class Eventlite extends React.Component {
   render() {
     return (
       <div>
+        <h1 className="logo" ref={this.logo}>Eventlite</h1>
         <FormErrors formErrors={this.state.formErrors} />
         <EventForm
           formValid={this.state.formValid}
@@ -125,7 +133,10 @@ class Eventlite extends React.Component {
           start_datetime={this.state.start_datetime.value}
           location={this.state.location.value}
         />
+
         <EventsList events={this.state.events} />
+
+        <button onClick={this.changeLogoColour}>Click me to have fun</button>
       </div>
     );
   }
