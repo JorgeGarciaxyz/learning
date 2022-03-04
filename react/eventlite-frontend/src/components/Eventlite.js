@@ -88,6 +88,7 @@ class Eventlite extends React.Component {
     axios({
       method: "POST",
       url: 'http://localhost:3001/api/v1/events',
+      headers: JSON.parse(localStorage.user),
       data: { event: newEvent }
     })
       .then((response) => {
@@ -129,7 +130,6 @@ class Eventlite extends React.Component {
   render() {
     return (
       <div>
-        <h1 className="logo" ref={this.logo}>Eventlite</h1>
         <FormErrors formErrors={this.state.formErrors} />
         <EventForm
           formValid={this.state.formValid}

@@ -8,7 +8,7 @@ module Api
       end
 
       def create
-        @event = Event.new(event_params)
+        @event = current_api_v1_user.events.new(event_params)
 
         if @event.save
           render json: @event
