@@ -128,10 +128,13 @@ class Eventlite extends React.Component {
   }
 
   render() {
+    const currentUser = localStorage.getItem("user");
+
     return (
       <div>
         <FormErrors formErrors={this.state.formErrors} />
-        <EventForm
+        {currentUser &&
+          <EventForm
           formValid={this.state.formValid}
           handleSubmit={this.handleSubmit}
           handleInput={this.handleInput}
@@ -139,10 +142,9 @@ class Eventlite extends React.Component {
           start_datetime={this.state.start_datetime.value}
           location={this.state.location.value}
         />
+        }
 
         <EventsList events={this.state.events} />
-
-        <button onClick={this.changeLogoColour}>Click me to have fun</button>
       </div>
     );
   }
