@@ -7,6 +7,14 @@ module Api
         render json: @events
       end
 
+      def show
+        @event = Event.find(params[:id])
+        render json: @event.as_json(
+          except: :user_id,
+          include: { user: { only: [:name, :nickname, :image] } }
+        )
+      end
+
       def create
         @event = current_api_v1_user.events.new(event_params)
 

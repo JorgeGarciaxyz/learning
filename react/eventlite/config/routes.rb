@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     namespace :v1, defaults: { format: :json } do
       mount_devise_token_auth_for 'User', at: 'auth'
 
-      resources :events, only: [:index, :create]
+      resources :events, only: [:index, :create, :show]
     end
   end
 end
