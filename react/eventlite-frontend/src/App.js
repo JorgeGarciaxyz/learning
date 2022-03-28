@@ -2,6 +2,7 @@ import './App.css';
 import AppHeader from "./components/AppHeader";
 import Eventlite from './components/Eventlite';
 import AuthForm from './components/AuthForm';
+import Event from './components/Event';
 
 import {
   BrowserRouter as Router,
@@ -31,6 +32,8 @@ function App() {
             <Navigate replace to="/" /> :
             <AuthForm title="Sign up" url="auth" />
         }/>
+
+        <Route path="/events/:id" element={<Event/>} />
       </Routes>
     </Router>
   );
