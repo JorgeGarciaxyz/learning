@@ -3,6 +3,7 @@ import AppHeader from "./components/AppHeader";
 import Eventlite from './components/Eventlite';
 import AuthForm from './components/AuthForm';
 import Event from './components/Event';
+import EventForm from './components/EventForm';
 
 import {
   BrowserRouter as Router,
@@ -34,6 +35,11 @@ function App() {
         }/>
 
         <Route path="/events/:id" element={<Event/>} />
+        <Route path="/events/:id/edit" element={
+          currentUser ?
+            <EventForm/> :
+            <AuthForm title="Log in" url="auth/sign_in" />
+        } />
       </Routes>
     </Router>
   );
