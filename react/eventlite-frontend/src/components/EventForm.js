@@ -12,7 +12,25 @@ class EventForm extends React.Component {
       start_datetime: {value: '', valid: false},
       location: {value: '', valid: false},
       formErrors: {},
-      formValid: false
+      formValid: false,
+      editing: false
+    }
+  }
+
+  componentDidMount () {
+    // Still not sure how to get params from current route
+    if(true) {
+      axios({
+        method: "GET",
+        url: `http://localhost:3001/api/v1/events/12`,
+        headers: JSON.parse(localStorage.getItem('user'))
+      }).then((response) => {
+        this.setState({
+          title: {valid: true, value: response.data.title},
+          location: {valid: true, value: response.data.location},
+          start_datetime: {valid: true, value: new Date(response.data.start_datetime).toDateString()},
+        }, this.validateForm)
+      });
     }
   }
 
@@ -60,7 +78,7 @@ class EventForm extends React.Component {
         this.resetFormErrors();
       })
       .catch((error) => {
-        this.setState({ formErrors: error.response.data });
+        this.setState({ formErrors: error.response.data, formValid: false });
       });
   };
 
