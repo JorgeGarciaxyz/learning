@@ -31,13 +31,4 @@ const EventForm = (props) => (
   </div>
 );
 
-EventForm.propTypes = {
-  handleSubmit: PropTypes.func.isRequired,
-  handleInput: PropTypes.func.isRequired,
-  formValid: PropTypes.bool.isRequired,
-  title: PropTypes.string.isRequired,
-  start_datetime: PropTypes.string.isRequired,
-  location: PropTypes.string.isRequired
-}
-
 export default EventForm;
