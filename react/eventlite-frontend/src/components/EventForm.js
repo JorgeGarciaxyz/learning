@@ -1,8 +1,13 @@
-import React from "react";
+import React, { Component } from "react";
 import PropTypes from'prop-types'
 import FormErrors from './FormErrors'
 import validations from '../validations'
 import axios from 'axios'
+import { useParams } from "react-router-dom";
+
+function withParams(Component) {
+  return props => <Component {...props} params={useParams()} />;
+}
 
 class EventForm extends React.Component {
   constructor(props) {
@@ -18,11 +23,10 @@ class EventForm extends React.Component {
   }
 
   componentDidMount () {
-    // Still not sure how to get params from current route
     if(true) {
       axios({
         method: "GET",
-        url: `http://localhost:3001/api/v1/events/12`,
+        url: `http://localhost:3001/api/v1/events/${this.props.params.id}`,
         headers: JSON.parse(localStorage.getItem('user'))
       }).then((response) => {
         this.setState({
@@ -108,7 +112,7 @@ class EventForm extends React.Component {
   }
 
   render() {
-    return (
+     return (
       <div>
         <h4>Create an Event:</h4>
         <FormErrors formErrors = {this.state.formErrors} />
@@ -124,4 +128,6 @@ class EventForm extends React.Component {
   }
 }
 
-export default EventForm
+// Each time this is rendered, it would use the EventForm to render and pass any props
+// to it.
+export default withParams(EventForm);
