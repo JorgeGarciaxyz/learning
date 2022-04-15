@@ -85,7 +85,9 @@ class EventForm extends React.Component {
       data: { event: event }
     })
       .then((response) => {
-        this.addNewEvent(response.data);
+        if (!this.state.editing && this.props.onSucess) {
+          this.props.onSucess(response.data)
+        }
         this.resetFormErrors();
       })
       .catch((error) => {
@@ -149,6 +151,10 @@ class EventForm extends React.Component {
       </div>
     )
   }
+}
+
+EventForm.propTypes = {
+  onSuccess: PropTypes.func,
 }
 
 // Each time this is rendered, it would use the EventForm to render and pass any props

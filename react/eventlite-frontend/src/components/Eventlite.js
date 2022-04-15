@@ -46,7 +46,7 @@ class Eventlite extends React.Component {
     return (
       <div>
         {currentUser &&
-          <EventForm />
+          <EventForm onSuccess={this.addNewEvent} />
         }
 
         <EventsList events={this.state.events} />
