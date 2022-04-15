@@ -23,6 +23,11 @@ class EventForm extends React.Component {
   }
 
   componentDidMount () {
+    if (this.props.params.id) {
+      this.setState({
+        editing: true
+      })
+    }
     if(true) {
       axios({
         method: "GET",
@@ -65,7 +70,7 @@ class EventForm extends React.Component {
   handleSubmit = (e) => {
     e.preventDefault();
 
-    let newEvent = {
+    let event = {
       title: this.state.title.value,
       start_datetime: this.state.start_datetime.value,
       location: this.state.location.value
@@ -111,11 +116,25 @@ class EventForm extends React.Component {
     this.setState({formErrors: {}})
   }
 
+  titleText(){
+    let title = "";
+
+    if (this.state.editing) {
+      title = "Update an event";
+    } else {
+      title = "Create and event";
+    }
+
+    return title;
+  }
+
   render() {
      return (
       <div>
-        <h4>Create an Event:</h4>
+        <h4>{this.titleText()}</h4>
+
         <FormErrors formErrors = {this.state.formErrors} />
+
         <form onSubmit={this.handleSubmit}>
           <input type="text" name="title" placeholder="Title" value={this.state.title.value} onChange={this.handleInput} />
           <input type="text" name="start_datetime" placeholder="Date" value={this.state.start_datetime.value} onChange={this.handleInput} />
