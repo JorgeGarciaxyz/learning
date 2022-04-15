@@ -35,6 +35,15 @@ module Api
         end
       end
 
+      def destroy
+        @event = current_api_v1_user.events.find(params[:id])
+        if @event.destroy
+          head :no_content, status: :ok
+        else
+          render json: @event.errors, status: :unprocessable_entity
+        end
+      end
+
       private
 
       def event_params

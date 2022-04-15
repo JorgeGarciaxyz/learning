@@ -134,6 +134,18 @@ class EventForm extends React.Component {
     return texts;
   }
 
+  deleteEvent = () => {
+    if(window.confirm("Are you sure you want to delete this event?")) {
+      axios({
+        method: 'DELETE',
+        url: `http://localhost:3001/api/v1/events/${this.props.match.params.id}`,
+        headers: JSON.parse(localStorage.getItem('user'))
+      }).then((response) => {
+        this.props.history.push('/')
+      })
+    }
+  }
+
   render() {
      return (
       <div>
@@ -148,6 +160,12 @@ class EventForm extends React.Component {
           <input type="submit" value={this.texts()["button"]}
            disabled={!this.state.formValid} />
         </form>
+
+        {this.state.editing &&
+        <p>
+          <button onClick={this.deleteEvent}>Delete Event</button>
+        </p>
+        }
       </div>
     )
   }
