@@ -70,17 +70,19 @@ class EventForm extends React.Component {
   handleSubmit = (e) => {
     e.preventDefault();
 
-    let event = {
+    const event = {
       title: this.state.title.value,
       start_datetime: this.state.start_datetime.value,
       location: this.state.location.value
     };
+    const method = this.state.editing ? 'PUT' : 'POST'
+    const url = this.state.editing ? `events/${this.props.params.id}` : "events"
 
     axios({
-      method: "POST",
-      url: 'http://localhost:3001/api/v1/events',
+      method: method,
+      url: `http://localhost:3001/api/v1/${url}`,
       headers: JSON.parse(localStorage.user),
-      data: { event: newEvent }
+      data: { event: event }
     })
       .then((response) => {
         this.addNewEvent(response.data);
@@ -116,22 +118,24 @@ class EventForm extends React.Component {
     this.setState({formErrors: {}})
   }
 
-  titleText(){
-    let title = "";
+  texts(){
+    let texts = {}
 
     if (this.state.editing) {
-      title = "Update an event";
+      texts["button"] = "Update"
+      texts["title"] = "Update an event";
     } else {
-      title = "Create and event";
+      texts["button"] = "Create"
+      texts["title"] = "Create and event";
     }
 
-    return title;
+    return texts;
   }
 
   render() {
      return (
       <div>
-        <h4>{this.titleText()}</h4>
+        <h4>{this.texts()["title"]}</h4>
 
         <FormErrors formErrors = {this.state.formErrors} />
 
@@ -139,7 +143,7 @@ class EventForm extends React.Component {
           <input type="text" name="title" placeholder="Title" value={this.state.title.value} onChange={this.handleInput} />
           <input type="text" name="start_datetime" placeholder="Date" value={this.state.start_datetime.value} onChange={this.handleInput} />
           <input type="text" name="location" placeholder="Location" value={this.state.location.value} onChange={this.handleInput} />
-          <input type="submit" value="Create Event"
+          <input type="submit" value={this.texts()["button"]}
            disabled={!this.state.formValid} />
         </form>
       </div>

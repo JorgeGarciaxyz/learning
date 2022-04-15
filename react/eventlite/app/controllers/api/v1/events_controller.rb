@@ -25,6 +25,16 @@ module Api
         end
       end
 
+      def update
+        @event = current_api_v1_user.events.find(params[:id])
+
+        if @event.update(event_params)
+          render json: @event
+        else
+          render json: @event.errors, status: :unprocessable_entity
+        end
+      end
+
       private
 
       def event_params
