@@ -3,7 +3,6 @@ import AppHeader from "./components/AppHeader";
 import Eventlite from './components/Eventlite';
 import AuthForm from './components/AuthForm';
 import Event from './components/Event';
-import Eevent from './components/Eevent';
 import EventForm from './components/EventForm';
 
 import {
@@ -36,7 +35,6 @@ function App() {
         }/>
 
         <Route path="/events/:id" element={<Event/>} />
-        <Route path="/eevents/:id" element={<Eevent/>} />
         <Route path="/events/:id/edit" element={
           currentUser ?
             <EventForm/> :
