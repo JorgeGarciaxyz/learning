@@ -3,10 +3,8 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { ErrorMessage } from '@hookform/error-message';
 
-export default function MeepAuthForm(props) {
-  const { register, formState: { errors }, handleSubmit } = useForm({
-    criteriaMode: "all"
-  });
+function AuthForm(props) {
+  const { register, formState: { errors }, handleSubmit } = useForm({criteriaMode: "all"});
   const onSubmit = data => {
     axios({
       method: 'POST',
@@ -25,7 +23,7 @@ export default function MeepAuthForm(props) {
     })
   }
 
-  return (
+  return(
     <form onSubmit={handleSubmit(onSubmit)}>
       <h1>{props.title}</h1>
       <input {...register(
@@ -56,4 +54,6 @@ export default function MeepAuthForm(props) {
       <input type="submit" />
     </form>
   );
-};
+}
+
+export default AuthForm
