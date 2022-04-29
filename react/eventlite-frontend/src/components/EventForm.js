@@ -154,9 +154,27 @@ class EventForm extends React.Component {
         <FormErrors formErrors = {this.state.formErrors} />
 
         <form onSubmit={this.handleSubmit}>
-          <input type="text" name="title" placeholder="Title" value={this.state.title.value} onChange={this.handleInput} />
-          <input type="text" name="start_datetime" placeholder="Date" value={this.state.start_datetime.value} onChange={this.handleInput} />
-          <input type="text" name="location" placeholder="Location" value={this.state.location.value} onChange={this.handleInput} />
+          <input type="text"
+            name="title"
+            placeholder="Title"
+            data-testid="title"
+            value={this.state.title.value}
+            onChange={this.handleInput} />
+
+          <input type="text"
+            name="start_datetime"
+            placeholder="Date"
+            data-testid="start_datetime"
+            value={this.state.start_datetime.value}
+            onChange={this.handleInput} />
+
+          <input type="text"
+            name="location"
+            placeholder="Location"
+            data-testid="location"
+            value={this.state.location.value}
+            onChange={this.handleInput} />
+
           <input type="submit" value={this.texts()["button"]}
            disabled={!this.state.formValid} />
         </form>
