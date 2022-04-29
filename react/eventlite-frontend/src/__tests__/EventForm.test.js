@@ -4,14 +4,20 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import EventForm from "../components/EventForm";
 import moment from 'moment'
 
-test("submit button is disabled for empty form", () => {
-  render(
-    <Router>
-       <EventForm />)
-    </Router>
-  )
-  const submitButton = screen.getByRole("button", { type: "submit"} );
+let container, submitButton, title, startDate, location
 
+const setup = () => render(<EventForm/>);
+
+beforeEach(() => {
+  setup();
+  submitButton = screen.getByRole("button", { type: "submit"} );
+  title = screen.getByTestId("title");
+  startDate = screen.getByTestId("start_datetime");
+  location = screen.getByTestId("location");
+})
+
+test("submit button is disabled for empty form", () => {
+  setup();
   expect(submitButton).toBeDisabled();
 })
 
