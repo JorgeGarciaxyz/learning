@@ -1,12 +1,16 @@
 # Determining If a Class has a Single Responsibility
 
-One way is to pretend that it’s sentient and to interrogate it. If you rephrase every one of its methods as a question, asking the question ought to make sense. For example, “Please, Mr. Gear, what is your ratio?” seems perfectly reasonable, while “Please, Mr. Gear, what are your gear_inches?” is on shaky ground, and “Please, Mr. Gear, what is your tire (size)?” is just downright ridiculous.
+One way is to pretend that it’s sentient and to interrogate it. If you rephrase every one
+of its methods as a question, asking the question ought to make sense. For example,
+“Please, Mr. Gear, what is your ratio?” seems perfectly reasonable, while “Please, Mr.
+Gear, what are your gear_inches?” is on shaky ground, and “Please, Mr. Gear, what is your
+tire (size)?” is just downright ridiculous.
 
 # Hide Data Structures
 Use Object Oriented Design to provide a DRY representation of a complex data structure.
 
 ```ruby
-def initialize(data)
+def initialize(data)§
   @wheels = wheelify(data)
 end
 
