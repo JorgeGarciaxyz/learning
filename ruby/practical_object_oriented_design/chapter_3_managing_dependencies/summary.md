@@ -35,3 +35,26 @@ end
 Recognize that the responsibility for knowing the name of a class and the responsibility for know- ing the name of a message to send to that class may belong in different objects.
 Because Gear needs to send diameter somewhere does not mean that Gear should know about Wheel.
 
+# Isolate Dependencies
+
+It may not be possible to break all dependencies. In this case, is better to isolate and
+expose these dependencies. So they would be easy to recognize.
+To explicitly expose the dependency, you can isolate the creation of a new Wheel inside
+the Gear class.
+
+```ruby
+# Publicily exposes the dependency in the initialize
+
+def initialize(chainring, cog, rim, tire)
+  @wheel = Wheel.new(rim, tire)
+end
+```
+
+The next alternative isolates the creation of a new Wheel in its own `wheel` method.
+```ruby
+def wheel
+  @wheel ||= Wheel.new(rim, tire)
+end
+```
+
+These two approaches reveal dependencies insitead of concealing them.
