@@ -90,3 +90,55 @@ Variable types with a name such as `category` or `type` are a clue to notice the
 
 Inheritance aims to solve the exact problem the above code is suffering, highly related types
 that share common behavior but differ along.
+
+# 6.4 Finding the right abstraction
+
+For inheritance to work, two things must always be true:
+
+**1. The objects you're modeling must truly have a generalization-specialization relationship.**
+**2. Use the correct coding techniques.**
+
+### 6.4.2 Promoting Abstract Behavior
+
+The general rule for refactoring into a new inheritance hierarchy is to arrange code so that
+you can promote abstractions rather than demote concretions.
+
+### 6.4.4 Using the Template Method Pattern
+
+Ex:
+```ruby
+class Bicycle
+  def initialize(**opts)
+    @chain = opts[:chain] || default_chain
+  end
+end
+
+class MtbBike < Bicycle
+  def default_chain
+    "31 spikes"
+  end
+end
+```
+
+While wrapping the defaults in methods  is good practice, this serve a dual purpose.
+Bicycle main goal in sending these messages is to give subclasses an opportunity to contribute
+specializations by overriding them.
+
+This technique of defining a basic structure in the superclass and sending messages to
+acquire subclass-specific contributions is known as **template method** pattern.
+
+### 6.4.5 Implementing every template method
+
+`Bicycle` initialize method sends `default_chain` but `Bicycle` does not implement it. This
+is desastrous for new classes, so always make sure this is implemented.
+
+Any class that uses the template method pattern must supply an implementation for every messages
+it sends.
+
+```ruby
+class Bicycle
+  def default_chain
+    raise NotImplementedError
+  end
+end
+```
