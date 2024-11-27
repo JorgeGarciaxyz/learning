@@ -133,7 +133,7 @@ acquire subclass-specific contributions is known as **template method** pattern.
 is desastrous for new classes, so always make sure this is implemented.
 
 Any class that uses the template method pattern must supply an implementation for every messages
-it sends.
+it sends. Even if it looks like this:
 
 ```ruby
 class Bicycle
@@ -142,3 +142,109 @@ class Bicycle
   end
 end
 ```
+
+Creating code that fails with reasonable error messages takes minor effort in the present,
+but provides value forever. Each error message is a small thing, but small things accumulate
+to produce big effects, this attention to detail marks you as a serious programmer.
+
+**Always** document template methods requirements by implementing matching methods that raise useful
+errors.
+
+## 6.5 Managign coupling between Superclasses and Subclasses
+
+### 6.5.1 Understanding coupling
+
+This implementation is easy but produces the more tightly coupling.
+
+```ruby
+class RoadBike < Bike
+  def spares
+    {
+      chain: "11-speep",
+      tire_size: "23",
+      tape_color: tape_color
+    }
+  end
+end
+
+class MtbBike < Bike
+  def spares
+    super.merge(front_shock: front_shock)
+  end
+end
+
+class Bike
+  def spares
+    {
+      tire_size: tire_size,
+      chain: chain
+    }
+  end
+end
+```
+
+Final implementation:
+```ruby
+class Bike
+  def initialize(**opts)
+    @size = opts[:size]
+    @chain = opts[:chain]
+    @tire_size = opts[:tire_size] || default_tire_size
+  end
+
+  def spares
+    {...}
+  end
+
+  def default_chain
+    "11-sped"
+  end
+
+  def default_tire_size
+    raise NotImplementedError
+  end
+end
+
+class Mtb < Bike
+  def initialize(**opts)
+    @front_shock = opts[:front_shock]
+    super
+  end
+
+  # rest of the code...
+end
+
+class Road < Bike
+  def initialize(**opts)
+    @tape_color = opts[:tape_color]
+    super
+  end
+end
+```
+
+Each subclass follow a similar pattern, they know things about themselves and their superclass.
+Knowing things about other classes creates dependencies and this creates coupling between objects.
+
+Creating a new bike is a booby trap:
+```ruby
+class EBike < Bike
+  def initialize(**opts)
+    @flag = opts[:flag] # forgot to send super
+  end
+end
+
+e_bike = EBike.new
+e_bike.spares # raise tire_size not implemented as isn't initialized via super...
+```
+
+This pattern requires subclasses not only know what they do but how they're supposed to interact
+with their superclass. Forcing a subclass to know how to interact with its abstract superclass
+causes many problems.
+
+It creates the next problems:
+- Forces each subclass to send super to participate
+- It causes duplication of code requiring all send super in exactly the same places.
+- Raises the change that future programmers will create errors when writing new subclasses,
+  as they can easily forget to send super.
+
+### 6.5.2 Decoupling Subclasses Using Hook Messages
