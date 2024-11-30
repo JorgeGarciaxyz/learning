@@ -248,3 +248,150 @@ It creates the next problems:
   as they can easily forget to send super.
 
 ### 6.5.2 Decoupling Subclasses Using Hook Messages
+
+Instead of allowing the subclasses to know the algorithm and requiring they send super,
+superclasses can instead send `hook` messages, ones that exist solely to provide subclasses a
+place to contribute information by implementing matching methods.
+This strategy removes knowledge of the algorithm from the subclass and returns control to the
+superclass.
+
+```ruby
+class Bike
+  attr_reader :....
+
+  def initialize(**opts)
+    @size = opts[:size]
+    @chain = opts[:chain] || default_chain
+    @tire_size = opts[:tire_size] || default_tire_size
+
+    post_initialize(opts)
+  end
+
+  def post_initialize(opts)
+    raise NotImplementedError
+  end
+end
+
+class Road < Bike
+  attr_reader :tape_color
+
+  def post_initialize(opts)
+    @tape_color = opts[:tape_color]
+  end
+end
+```
+
+This approach removes the need to call `super` and the initialize method entirely.
+Instead, it contributes to a larger abstract algorithm.
+
+`Road` is still responsible for what initialization it needs but is no longer responsible
+for `when` its initialization occurs.
+
+This change allows `Road` to know less about `Bicycle` reducing the coupling between them
+and making each more flexible in the face of an uncertain future.
+
+Roadbike doesn't know when its `post_initialize` method will be called and it doesn't care
+what object actually sends the message.
+
+Putting control of the timing in the superclass means the algorithm can change without
+forcing changes upon the subclasses.
+
+The same technique can be used to remove the send of `super` from the spares method. Instead,
+you can loosen coupling by implementing a hook that gives you control back to Bicycle.
+
+```ruby
+class Bike
+  # ...
+  def spares
+    {
+      tire_size: tire_size,
+      chain: chain
+    }.merge(local_spares)
+  end
+
+  def local_spares
+    {}
+  end
+end
+
+class RoadBike < Bike
+  def local_spares
+    { tape_color: tape_color }
+  end
+end
+```
+
+This change preserves the specialization supplied by `RoadBike` but reduces the coupling
+to `Bike`.
+
+Roadbike no longer has to know that Bike implements a spare method, it merely expects that is
+own implementation of `local_spares` will be called by some object at some time.
+
+Final product:
+
+```ruby
+class Bike
+  attr_reader :....
+
+  def initialize(**opts)
+    @size = opts[:size]
+    @chain = opts[:chain] || default_chain
+    @tire_size = opts[:tire_size] || default_tire_size
+
+    post_initialize(opts)
+  end
+
+  def post_initialize(opts)
+    raise NotImplementedError
+  end
+
+  def spares
+    {
+      tire_size: tire_size,
+      chain: chain
+    }.merge(local_spares)
+  end
+
+  def local_spares
+    {}
+  end
+end
+
+class Mtb < Bike
+  attr_reader :front_shock, :rear_shock
+
+  def post_initialize(opts)
+    @front_shock = opts[:front_shock]
+    @rear_shock = opts[:rear_shock]
+  end
+
+  def local_spares
+    { front_shock: front_shock, rear_shock: rear_shock }
+  end
+
+  def default_tire_size
+    "29 in"
+  end
+end
+```
+
+# Summary
+
+Inheritance solves the problem of related types that share a great deal of common behavior
+but differ acrss some dimension. It allows you to isolate shared code and implement common
+algorithms in an abstract class while also providing a structure that permits subclasses to
+contribute specializations.
+
+Abstract superclasses use the template method pattern to invite inheritors to supply specializations
+and they use hook methods to allow these inheritors to contribute these specializations without being
+forced to send `super`.
+
+Hook methods allow subclasses to contribtuee specializations without knowing the abstract algorithm.
+They remove the need for subclasses to send super and therefore reduce the coupling between layers of
+the hierarchy and increase its tolerance for change.
+
+Well-designed inheritance hierarchies are easy to extend with new subclasses even for programmers
+who know very little about the application. This ease of extension is inheritance greatest strength.
+
+When your problem is one of needing numerous specializations of a stable common abstraction, inheritance
+can be an extremely low-cost solution.
